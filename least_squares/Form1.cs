@@ -4,6 +4,7 @@ using System.Data;
 using System.Windows.Forms;
 using System.IO;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Drawing;
 using static TrendLine;
 
 namespace least_squares
@@ -13,6 +14,10 @@ namespace least_squares
         string fname = ""; // Filename to use.
         string fdir = @"c:\test\"; // Initial directory in which to look for files.
         string ffilter = "All files (*.*)|*.*|CSV files (*.csv)|*.csv"; // File filter.
+        ToolTip tooltip = new ToolTip();
+        Point clickPosition ;
+
+        DataTable dataTable = new DataTable();
 
         public Form1()
         {
@@ -22,10 +27,28 @@ namespace least_squares
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
-
         }
 
+
+
+        private void chart1_MouseClick(object sender, MouseEventArgs e)
+        {
+            var pos = e.Location;
+            clickPosition = pos;
+            var results = chart1.HitTest(pos.X, pos.Y, false,
+                                         ChartElementType.PlottingArea);
+            foreach (var result in results)
+            {
+                if (result.ChartElementType == ChartElementType.PlottingArea)
+                {
+                    var xVal = Math.Round(result.ChartArea.AxisX.PixelPositionToValue(pos.X),1);
+                    var yVal = Math.Round(result.ChartArea.AxisY.PixelPositionToValue(pos.Y),1);
+                    
+                    this.dataTable.Rows.Add(xVal,yVal);
+                }
+            }
+
+        }
         private void showButton_Click(object sender, EventArgs e)
         {
             // Request a file.
@@ -71,7 +94,6 @@ namespace least_squares
             this.chart1.Series.Add(series2);
 
             // Set up data grid.
-            DataTable dataTable = new DataTable();
             dataTable.Columns.Add("x");
             dataTable.Columns.Add("y");
 
