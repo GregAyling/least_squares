@@ -14,9 +14,7 @@ namespace least_squares
         string fname = ""; // Filename to use.
         string fdir = @"c:\test\"; // Initial directory in which to look for files.
         string ffilter = "All files (*.*)|*.*|CSV files (*.csv)|*.csv"; // File filter.
-        ToolTip tooltip = new ToolTip();
         Point clickPosition ;
-
         DataTable dataTable = new DataTable();
 
         public Form1()
@@ -29,14 +27,16 @@ namespace least_squares
         {
         }
 
-
+        private void dataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            MessageBox.Show("RowsAdded");
+        }
 
         private void chart1_MouseClick(object sender, MouseEventArgs e)
         {
             var pos = e.Location;
             clickPosition = pos;
-            var results = chart1.HitTest(pos.X, pos.Y, false,
-                                         ChartElementType.PlottingArea);
+            var results = chart1.HitTest(pos.X, pos.Y, false, ChartElementType.PlottingArea);
             foreach (var result in results)
             {
                 if (result.ChartElementType == ChartElementType.PlottingArea)
@@ -47,6 +47,9 @@ namespace least_squares
                     this.dataTable.Rows.Add(xVal,yVal);
                 }
             }
+            
+            // Display chart.
+            refreshChart(sender, e);
 
         }
         private void showButton_Click(object sender, EventArgs e)
